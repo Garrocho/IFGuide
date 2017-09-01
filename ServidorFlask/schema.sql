@@ -10,7 +10,9 @@ create table periodos (
 create table eventos (
   id integer primary key autoincrement,
   tipo integer,
+  hora varchar,
   data varchar,
+  duracao varchar,
   titulo varchar,
   descricao text
 );

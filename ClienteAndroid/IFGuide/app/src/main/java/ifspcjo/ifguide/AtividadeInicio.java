@@ -15,46 +15,59 @@ import com.github.kittinunf.fuel.core.Handler;
 import com.github.kittinunf.fuel.core.Request;
 import com.github.kittinunf.fuel.core.Response;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class AtividadeInicio extends AppCompatActivity {
-    public ArrayList<String> a = new ArrayList<String>();
-    //a.Add("teste");
     ListView lv;
-    String[] s = new String[] {"prova \n 31/08/2017","trabalho \n 01/09/2017"};
-    //String[] s2 = new String[] {"teste\n 31/08/2017","trabalho \n 01/09/2017"};
+    public ArrayList<String> titulos;
+    public ArrayList<String> descricoes;
+    public ArrayList<String> datas;
+    public ArrayList<String> horas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.atividade_inicio);
 
-        lv=(ListView)findViewById(R.id.lista);
-        ArrayAdapter ad=new ArrayAdapter(AtividadeInicio.this,android.R.layout.simple_expandable_list_item_1,s);
-        lv.setAdapter(ad);
-        //ad.add("");
-        //ArrayAdapter ad2=new ArrayAdapter(AtividadeInicio.this,android.R.layout.simple_expandable_list_item_1,s2);
-        //lv.setAdapter(ad2);
-        //get
-        Fuel.get("http://10.125.228.167:8080/periodos").responseString(new Handler<String>() {
+        Fuel.get("http://192.168.43.62:8080/eventos").responseString(new Handler<String>() {
             @Override
             public void failure(Request request, Response response, FuelError error) {
                 //do something when it is failure
-                Log.e("erro",error.toString());
+                Log.e("erro", error.toString());
             }
 
             @Override
             public void success(Request request, Response response, String data) {
-                Log.e("sucesso",data);
-                //do something when it is successful
-                //Toast.makeText(AtividadeInicio.this, data, Toast.LENGTH_SHORT).show();
+                Log.e("sucesso", data);
+                try {
+                    JSONArray jsonEventos = new JSONArray(data);
+                    JSONObject evento;
+
+                    titulos = new ArrayList<String>();
+                    datas = new ArrayList<String>();
+                    descricoes = new ArrayList<String>();
+                    horas = new ArrayList<String>();
+
+                    for (int i=0; i<jsonEventos.length(); i++) {
+                        evento = new JSONObject(jsonEventos.getString(i));
+                        titulos.add(evento.getString("titulo"));
+                        datas.add(evento.getString("data"));
+                        descricoes.add(evento.getString("descricao"));
+                        horas.add(evento.getString("hora") + " as " + evento.getString("duracao"));
+
+                    }
+
+                }catch (Exception erro) {
+                    Log.e("ERROR", erro.getMessage());
+                }
+
+                lv=(ListView)findViewById(R.id.lista);
+                Adaptador adaptador = new Adaptador(AtividadeInicio.this, titulos, descricoes, datas, horas);
+                lv.setAdapter(adaptador);
             }
         });
 
-    }
-    public void addItems(String titulo ,String data) {
-        String aux=titulo+"\n"+data;
-        //a.Add(aux);
-        ArrayAdapter ad2=new ArrayAdapter(AtividadeInicio.this,android.R.layout.simple_expandable_list_item_1,a);
-        lv.setAdapter(ad2);
     }
 }
 

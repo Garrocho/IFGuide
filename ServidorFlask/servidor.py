@@ -76,10 +76,10 @@ def bd_obter_eventos():
       mensagens.append(info)
     return mensagens
 
-def bd_adicionar_evento(tipo, data, titulo, descricao):
+def bd_adicionar_evento(tipo, data, titulo, descricao, hora, duracao):
     db = bd_conecta()
-    db.execute('insert into eventos (tipo, data, titulo, descricao) values (?, ?, ? , ?)',
-                 [int(tipo), data, titulo, descricao])
+    db.execute('insert into eventos (tipo, data, titulo, descricao, hora, duracao) values (?, ?, ?, ?, ?, ?)',
+                 [int(tipo), data, titulo, descricao, hora, duracao])
     db.commit()
 
 def bd_deletar_evento(id):
@@ -124,8 +124,8 @@ def listar_eventos():
 
 @app.route('/add_evento')
 def adiciona_evento():
-    if 'tipo' in request.args and 'data' in request.args and 'titulo' in request.args and 'descricao' in request.args:
-        bd_adicionar_evento(request.args['tipo'], request.args['data'], request.args['titulo'], request.args['descricao'])
+    if 'tipo' in request.args and 'data' in request.args and 'titulo' in request.args and 'descricao' in request.args and 'hora' in request.args and 'duracao' in request.args:
+        bd_adicionar_evento(request.args['tipo'], request.args['data'], request.args['titulo'], request.args['descricao'], request.args['hora'], request.args['duracao'])
         return "Evento Adicionado!"
     else:
         return "Erro: Falta os Parametros: tipo, data, titulo, descricao."
@@ -143,4 +143,4 @@ def page_not_found(e):
     return "Pagina Nao Encontrada!"
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=8080)
+    app.run(host='192.168.43.62', port=8080)
