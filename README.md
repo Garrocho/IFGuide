@@ -1,4 +1,4 @@
-# IFGuide
+# EsOrMo (Estudo Organizado e Monitorado)
 Um Sistema de Planejamento e Organização de Atividades Acadêmicas
 
 ## Colaboradores
