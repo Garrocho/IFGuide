@@ -54,6 +54,18 @@ def bd_obter_periodos():
       mensagens.append(info)
     return mensagens
 
+def bd_obter_periodos_id(curso, serie):
+    db = bd_conecta()
+    cur = db.execute('select id from periodos where (curso = ? and serie = ?)',
+                        [curso, serie])
+    column_names = [d[0] for d in cur.description]
+    mensagens = []
+    for row in cur:
+      info = dict(zip(column_names, row))
+      mensagens.append(info)
+    return mensagens
+
+
 def bd_adicionar_periodo(curso, serie):
     db = bd_conecta()
     db.execute('insert into periodos (curso, serie) values (?, ?)',
@@ -69,6 +81,16 @@ def bd_deletar_periodo(id):
 def bd_obter_eventos():
     db = bd_conecta()
     cur = db.execute('select * from eventos')
+    column_names = [d[0] for d in cur.description]
+    mensagens = []
+    for row in cur:
+      info = dict(zip(column_names, row))
+      mensagens.append(info)
+    return mensagens
+
+def bd_obter_eventos_id(id):
+    db = bd_conecta()
+    cur = db.execute('select * from eventos where id = ?;',[id])
     column_names = [d[0] for d in cur.description]
     mensagens = []
     for row in cur:
@@ -97,7 +119,10 @@ def pagina_inicial():
 
 @app.route('/periodos')
 def listar_periodos():
-    periodos = bd_obter_periodos()
+    if 'curso' in request.args and 'serie' in request.args:
+            bd_obter_periodos_id(request.args['curso'], request.args['serie'])
+    else:
+        periodos = bd_obter_periodos()
     return jsonify(periodos)
 
 @app.route('/add_periodo')
@@ -119,8 +144,18 @@ def deleta_periodo():
 #############################################################
 @app.route('/eventos')
 def listar_eventos():
-    eventos = bd_obter_eventos()
+    if 'id' in request.args:
+        eventos = bd_obter_eventos_id(request.args['id'])
+    elif 'curso' in request.args and 'serie' in request.args:
+            eventos = bd_obter_eventos_id( bd_obter_periodos_id(request.args['curso'], request.args['serie']))
+    else:
+        eventos = bd_obter_eventos()
     return jsonify(eventos)
+
+#@app.route('/eventosid')
+#def listar_eventos():
+ #   eventos = bd_obter_eventos_id(request.args['id'])
+  #  return jsonify(eventos)
 
 @app.route('/add_evento')
 def adiciona_evento():
@@ -143,4 +178,4 @@ def page_not_found(e):
     return "Pagina Nao Encontrada!"
 
 if __name__ == "__main__":
-    app.run(host='192.168.43.62', port=8080)
+    app.run(host='127.0.0.1', port=8080)
