@@ -98,10 +98,20 @@ def bd_obter_eventos_id(id):
       mensagens.append(info)
     return mensagens
 
-def bd_adicionar_evento(tipo, data, titulo, descricao, hora, duracao):
+def bd_obter_eventos_id_periodos(id_periodo):
     db = bd_conecta()
-    db.execute('insert into eventos (tipo, data, titulo, descricao, hora, duracao) values (?, ?, ?, ?, ?, ?)',
-                 [int(tipo), data, titulo, descricao, hora, duracao])
+    cur = db.execute('select * from eventos where id_periodo = ?;',[id_periodo])
+    column_names = [d[0] for d in cur.description]
+    mensagens = []
+    for row in cur:
+      info = dict(zip(column_names, row))
+      mensagens.append(info)
+    return mensagens
+
+def bd_adicionar_evento(tipo, data, titulo, descricao, hora, duracao, id_periodo):
+    db = bd_conecta()
+    db.execute('insert into eventos (tipo, data, titulo, descricao, hora, duracao, id_periodo) values (?, ?, ?, ?, ?, ?, ?)',
+                 [int(tipo), data, titulo, descricao, hora, duracao, id_periodo])
     db.commit()
 
 def bd_deletar_evento(id):
@@ -120,7 +130,7 @@ def pagina_inicial():
 @app.route('/periodos')
 def listar_periodos():
     if 'curso' in request.args and 'serie' in request.args:
-            bd_obter_periodos_id(request.args['curso'], request.args['serie'])
+        periodos = bd_obter_periodos_id(request.args['curso'], request.args['serie'])
     else:
         periodos = bd_obter_periodos()
     return jsonify(periodos)
@@ -146,21 +156,17 @@ def deleta_periodo():
 def listar_eventos():
     if 'id' in request.args:
         eventos = bd_obter_eventos_id(request.args['id'])
-    elif 'curso' in request.args and 'serie' in request.args:
-            eventos = bd_obter_eventos_id( bd_obter_periodos_id(request.args['curso'], request.args['serie']))
+    elif 'id_periodo' in request.args:
+        eventos = bd_obter_eventos_id_periodos(request.args['id_periodo'])
     else:
         eventos = bd_obter_eventos()
     return jsonify(eventos)
 
-#@app.route('/eventosid')
-#def listar_eventos():
- #   eventos = bd_obter_eventos_id(request.args['id'])
-  #  return jsonify(eventos)
 
 @app.route('/add_evento')
 def adiciona_evento():
-    if 'tipo' in request.args and 'data' in request.args and 'titulo' in request.args and 'descricao' in request.args and 'hora' in request.args and 'duracao' in request.args:
-        bd_adicionar_evento(request.args['tipo'], request.args['data'], request.args['titulo'], request.args['descricao'], request.args['hora'], request.args['duracao'])
+    if 'tipo' in request.args and 'data' in request.args and 'titulo' in request.args and 'descricao' in request.args and 'hora' in request.args and 'duracao' in request.args and 'id_periodo' in request.args:
+        bd_adicionar_evento(request.args['tipo'], request.args['data'], request.args['titulo'], request.args['descricao'], request.args['hora'], request.args['duracao'], request.args['id_periodo'])
         return "Evento Adicionado!"
     else:
         return "Erro: Falta os Parametros: tipo, data, titulo, descricao."
