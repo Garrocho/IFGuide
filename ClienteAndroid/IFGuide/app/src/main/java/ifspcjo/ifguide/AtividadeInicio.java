@@ -30,7 +30,7 @@ public class AtividadeInicio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.atividade_inicio);
 
-        Fuel.get("http://192.168.43.62:8080/eventos").responseString(new Handler<String>() {
+        Fuel.get("http://127.0.0.1:8080/eventos").responseString(new Handler<String>() {
             @Override
             public void failure(Request request, Response response, FuelError error) {
                 //do something when it is failure
