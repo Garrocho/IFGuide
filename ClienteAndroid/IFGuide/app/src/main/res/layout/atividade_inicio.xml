@@ -13,12 +13,12 @@
         android:id="@+id/lista"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/editText3"
+        android:layout_below="@+id/campoCurso"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/campoSerie"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -29,25 +29,27 @@
         android:layout_alignParentStart="true" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/campoCurso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/editText"
-        android:layout_alignRight="@+id/editText"
-        android:layout_below="@+id/editText"
+        android:layout_alignEnd="@+id/campoSerie"
+        android:layout_alignRight="@+id/campoSerie"
+        android:layout_below="@+id/campoSerie"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Curso" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/btenviar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Enviar"
-        android:layout_alignBottom="@+id/editText3"
+        android:layout_alignBottom="@+id/campoCurso"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/editText"
-        android:layout_toEndOf="@+id/editText" />
+        android:layout_toRightOf="@+id/campoSerie"
+        android:layout_toEndOf="@+id/campoSerie" />
+
+
 </RelativeLayout>
