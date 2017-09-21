@@ -60,7 +60,7 @@ public class AtividadeInicio extends AppCompatActivity {
             public void onClick(View arg0) {
                 String serie = (recebeSerie.getText().toString());
                 String curso = (recebeCurso.getText().toString());
-                Fuel.get("http://http://127.0.0.1:8080/periodos?curso="+curso+"&serie="+serie).responseString(new Handler<String>() {
+                Fuel.get("http://192.168.43.62:8080/periodos?curso="+curso+"&serie="+serie).responseString(new Handler<String>() {
                     @Override
                     public void failure(Request request, Response response, FuelError error) {
                         //do something when it is failure
@@ -70,24 +70,30 @@ public class AtividadeInicio extends AppCompatActivity {
                     @Override
                     public void success(Request request, Response response, String data) {
                         Log.e("sucesso", data);
-                        JSONArray jsonPeriodos = new JSONArray(data);
-                        JSONObject periodos = new JSONObject(jsonPeriodos.getString(1));
-                        int id=(periodos.getString("id"));
-                        Fuel.get("http://http://127.0.0.1:8080/eventos?id="+id).responseString(new Handler<String>() {
-                            @Override
-                            public void failure(Request request, Response response, FuelError error) {
-                                //do something when it is failure
-                                Log.e("erro", error.toString());
-                            }
 
-                            @Override
-                            public void success(Request request, Response response, String data) {
-                                Log.e("sucesso", data);
-                                filtro(data);
-                                lv=(ListView)findViewById(R.id.lista);
-                                Adaptador adaptador = new Adaptador(AtividadeInicio.this, titulos, descricoes, datas, horas);
-                                lv.setAdapter(adaptador);
-                            }
+                        try {
+                            JSONArray jsonPeriodos = new JSONArray(data);
+                            JSONObject periodos = new JSONObject(jsonPeriodos.getString(1));
+                            String id= periodos.getString("id");
+                            Log.d("SUCESSO", String.valueOf(id));
+                            Fuel.get("http://192.168.43.62:8080/eventos?id_periodo="+id).responseString(new Handler<String>() {
+                                @Override
+                                public void failure(Request request, Response response, FuelError error) {
+                                    //do something when it is failure
+                                    Log.e("erro", error.toString());
+                                }
+
+                                @Override
+                                public void success(Request request, Response response, String data) {
+                                    Log.e("sucesso", data);
+                                    filtro(data);
+                                    lv=(ListView)findViewById(R.id.lista);
+                                    Adaptador adaptador = new Adaptador(AtividadeInicio.this, titulos, descricoes, datas, horas);
+                                    lv.setAdapter(adaptador);
+                                }
+                            });
+                        }catch (Exception error) {
+                        }
                     }
                 });
             }
