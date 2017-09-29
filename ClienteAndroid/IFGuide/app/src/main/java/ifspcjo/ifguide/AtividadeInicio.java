@@ -2,12 +2,12 @@ package ifspcjo.ifguide;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -20,27 +20,96 @@ import com.github.kittinunf.fuel.core.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.widget.*;
 import android.view.*;
-import android.app.*;
+import android.widget.Toast;
 
 public class AtividadeInicio extends AppCompatActivity {
     ListView lv;
+    public String idPer = "";
     public ArrayList<String> titulos;
     public ArrayList<String> descricoes;
     public ArrayList<String> datas;
     public ArrayList<String> horas;
-    public EditText recebeCurso,recebeSerie;
-    public Button btenviar;
+    public ArrayList<String> cursos;
+    public ArrayList<String> series;
+    public ArrayList<String> ids;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.atividade_inicio);
-        recebeSerie = (EditText) findViewById(R.id.campoSerie);
-        recebeCurso = (EditText) findViewById(R.id.campoCurso);
-        btenviar = (Button) findViewById(R.id.btenviar);
 
-            Fuel.get("http://http://127.0.0.1:8080/eventos").responseString(new Handler<String>() {
+        verificaPeriodo();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_principal, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.botao_voltar:
+                // User chose the "Settings" item, show the app settings UI...
+                verificaPeriodo();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    public void verificaPeriodo() {
+        Fuel.get("http://192.168.43.62:8080/periodos").responseString(new Handler<String>() {
+            @Override
+            public void failure(Request request, Response response, FuelError error) {
+                //do something when it is failure
+                Log.e("ERROU", error.toString());
+            }
+
+            @Override
+            public void success(Request request, Response response, String data) {
+                try {
+                    JSONArray jsonPeriodos = new JSONArray(data);
+                    JSONObject periodo;
+
+                    cursos = new ArrayList<String>();
+                    series = new ArrayList<String>();
+                    ids = new ArrayList<String>();
+
+                    for (int i=0; i<jsonPeriodos.length(); i++) {
+                        periodo = new JSONObject(jsonPeriodos.getString(i));
+                        cursos.add(periodo.getString("curso"));
+                        series.add(periodo.getString("serie"));
+                        ids.add(periodo.getString("id"));
+                    }
+
+                }catch (Exception erro) {
+                    Log.e("ERROR", erro.getMessage());
+                }
+
+                lv=(ListView)findViewById(R.id.lista);
+                AdaptadorPeriodos adaptadorPeriodos = new AdaptadorPeriodos(AtividadeInicio.this, cursos, series);
+                lv.setAdapter(adaptadorPeriodos);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        idPer = ids.get(position);
+                        baixarEventos();
+                    }
+                });
+            }
+        });
+    }
+
+    public void baixarEventos() {
+
+        Fuel.get("http://192.168.43.62:8080/eventos?id_periodo="+idPer).responseString(new Handler<String>() {
             @Override
             public void failure(Request request, Response response, FuelError error) {
                 //do something when it is failure
@@ -49,56 +118,15 @@ public class AtividadeInicio extends AppCompatActivity {
 
             @Override
             public void success(Request request, Response response, String data) {
-                Log.e("sucesso", data);
                 filtro(data);
                 lv=(ListView)findViewById(R.id.lista);
-                Adaptador adaptador = new Adaptador(AtividadeInicio.this, titulos, descricoes, datas, horas);
-                lv.setAdapter(adaptador);
-            }
-        });
-        btenviar.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-                String serie = (recebeSerie.getText().toString());
-                String curso = (recebeCurso.getText().toString());
-                Fuel.get("http://192.168.43.62:8080/periodos?curso="+curso+"&serie="+serie).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(Request request, Response response, FuelError error) {
-                        //do something when it is failure
-                        Log.e("erro", error.toString());
-                    }
-
-                    @Override
-                    public void success(Request request, Response response, String data) {
-                        Log.e("sucesso", data);
-
-                        try {
-                            JSONArray jsonPeriodos = new JSONArray(data);
-                            JSONObject periodos = new JSONObject(jsonPeriodos.getString(1));
-                            String id= periodos.getString("id");
-                            Log.d("SUCESSO", String.valueOf(id));
-                            Fuel.get("http://192.168.43.62:8080/eventos?id_periodo="+id).responseString(new Handler<String>() {
-                                @Override
-                                public void failure(Request request, Response response, FuelError error) {
-                                    //do something when it is failure
-                                    Log.e("erro", error.toString());
-                                }
-
-                                @Override
-                                public void success(Request request, Response response, String data) {
-                                    Log.e("sucesso", data);
-                                    filtro(data);
-                                    lv=(ListView)findViewById(R.id.lista);
-                                    Adaptador adaptador = new Adaptador(AtividadeInicio.this, titulos, descricoes, datas, horas);
-                                    lv.setAdapter(adaptador);
-                                }
-                            });
-                        }catch (Exception error) {
-                        }
-                    }
-                });
+                AdaptadorEventos adaptadorEventos = new AdaptadorEventos(AtividadeInicio.this, titulos, descricoes, datas, horas);
+                lv.setAdapter(adaptadorEventos);
             }
         });
     }
+
+
     public void filtro(String data){
         try {
             JSONArray jsonEventos = new JSONArray(data);
