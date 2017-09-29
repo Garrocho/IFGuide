@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 public class AtividadeInicio extends AppCompatActivity {
     ListView lv;
-    public String idPer = "";
+    public String idPer = null;
     public ArrayList<String> titulos;
     public ArrayList<String> descricoes;
     public ArrayList<String> datas;
@@ -53,6 +53,7 @@ public class AtividadeInicio extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.botao_voltar:
                 // User chose the "Settings" item, show the app settings UI...
+                idPer = null;
                 verificaPeriodo();
                 return true;
 
@@ -65,46 +66,60 @@ public class AtividadeInicio extends AppCompatActivity {
     }
 
     public void verificaPeriodo() {
-        Fuel.get("http://192.168.43.62:8080/periodos").responseString(new Handler<String>() {
-            @Override
-            public void failure(Request request, Response response, FuelError error) {
-                //do something when it is failure
-                Log.e("ERROU", error.toString());
-            }
 
-            @Override
-            public void success(Request request, Response response, String data) {
-                try {
-                    JSONArray jsonPeriodos = new JSONArray(data);
-                    JSONObject periodo;
+        // Busca o idPer na base de dados (criar Tabela)
+        // ....
+        //....
 
-                    cursos = new ArrayList<String>();
-                    series = new ArrayList<String>();
-                    ids = new ArrayList<String>();
+        if (idPer == null) {
 
-                    for (int i=0; i<jsonPeriodos.length(); i++) {
-                        periodo = new JSONObject(jsonPeriodos.getString(i));
-                        cursos.add(periodo.getString("curso"));
-                        series.add(periodo.getString("serie"));
-                        ids.add(periodo.getString("id"));
-                    }
-
-                }catch (Exception erro) {
-                    Log.e("ERROR", erro.getMessage());
+            Fuel.get("http://192.168.43.62:8080/periodos").responseString(new Handler<String>() {
+                @Override
+                public void failure(Request request, Response response, FuelError error) {
+                    //do something when it is failure
+                    Log.e("ERROU", error.toString());
                 }
 
-                lv=(ListView)findViewById(R.id.lista);
-                AdaptadorPeriodos adaptadorPeriodos = new AdaptadorPeriodos(AtividadeInicio.this, cursos, series);
-                lv.setAdapter(adaptadorPeriodos);
-                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        idPer = ids.get(position);
-                        baixarEventos();
+                @Override
+                public void success(Request request, Response response, String data) {
+                    try {
+                        JSONArray jsonPeriodos = new JSONArray(data);
+                        JSONObject periodo;
+
+                        cursos = new ArrayList<String>();
+                        series = new ArrayList<String>();
+                        ids = new ArrayList<String>();
+
+                        for (int i = 0; i < jsonPeriodos.length(); i++) {
+                            periodo = new JSONObject(jsonPeriodos.getString(i));
+                            cursos.add(periodo.getString("curso"));
+                            series.add(periodo.getString("serie"));
+                            ids.add(periodo.getString("id"));
+                        }
+
+                    } catch (Exception erro) {
+                        Log.e("ERROR", erro.getMessage());
                     }
-                });
-            }
-        });
+
+                    lv = (ListView) findViewById(R.id.lista);
+                    AdaptadorPeriodos adaptadorPeriodos = new AdaptadorPeriodos(AtividadeInicio.this, cursos, series);
+                    lv.setAdapter(adaptadorPeriodos);
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            idPer = ids.get(position);
+                            // Gravar no banco de dados o Selecionado.
+                            // ...
+                            // ...
+
+                            baixarEventos();
+                        }
+                    });
+                }
+            });
+        }else {
+            baixarEventos();
+        }
     }
 
     public void baixarEventos() {
