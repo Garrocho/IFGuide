@@ -23,6 +23,11 @@ import org.json.JSONObject;
 import android.view.*;
 import android.widget.Toast;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.content.Context;
+
 public class AtividadeInicio extends AppCompatActivity {
     ListView lv;
     public String idPer = null;
@@ -33,10 +38,14 @@ public class AtividadeInicio extends AppCompatActivity {
     public ArrayList<String> cursos;
     public ArrayList<String> series;
     public ArrayList<String> ids;
+    public UsuarioDAO dao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.atividade_inicio);
+
+        dao = new UsuarioDAO(getBaseContext());
+        boolean sucesso = dao.salvar(idPer);
 
         verificaPeriodo();
     }
@@ -68,12 +77,14 @@ public class AtividadeInicio extends AppCompatActivity {
     public void verificaPeriodo() {
 
         // Busca o idPer na base de dados (criar Tabela)
+        //UsuarioDAO dao = new UsuarioDAO(getBaseContext());
+        idPer=dao.retornaIdPer();
         // ....
         //....
 
         if (idPer == null) {
 
-            Fuel.get("http://192.168.43.62:8080/periodos").responseString(new Handler<String>() {
+            Fuel.get("http://127.0.0.1:8080/periodos").responseString(new Handler<String>() {
                 @Override
                 public void failure(Request request, Response response, FuelError error) {
                     //do something when it is failure
@@ -108,10 +119,10 @@ public class AtividadeInicio extends AppCompatActivity {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             idPer = ids.get(position);
-                            // Gravar no banco de dados o Selecionado.
-                            // ...
-                            // ...
-
+                            //----
+                            UsuarioDAO dao = new UsuarioDAO(getBaseContext());
+                            boolean sucesso = dao.salvar(idPer);
+                            //--
                             baixarEventos();
                         }
                     });
@@ -124,7 +135,7 @@ public class AtividadeInicio extends AppCompatActivity {
 
     public void baixarEventos() {
 
-        Fuel.get("http://192.168.43.62:8080/eventos?id_periodo="+idPer).responseString(new Handler<String>() {
+        Fuel.get("http://127.0.0.1:8080/eventos?id_periodo="+idPer).responseString(new Handler<String>() {
             @Override
             public void failure(Request request, Response response, FuelError error) {
                 //do something when it is failure
