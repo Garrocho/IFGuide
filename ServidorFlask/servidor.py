@@ -54,6 +54,7 @@ def bd_obter_periodos():
       mensagens.append(info)
     return mensagens
 
+
 def bd_obter_periodos_id(curso, serie):
     db = bd_conecta()
     cur = db.execute('select id from periodos where (curso = ? and serie = ?)',
@@ -77,6 +78,17 @@ def bd_deletar_periodo(id):
     db.execute('DELETE FROM periodos WHERE id = ?;',
                  [id])
     db.commit()
+#################################################################################
+def bd_obter_atualizacoes():
+    db = bd_conecta()
+    cur = db.execute('select * from atualizacoes')
+    column_names = [d[0] for d in cur.description]
+    mensagens = []
+    for row in cur:
+      info = dict(zip(column_names, row))
+      mensagens.append(info)
+    return mensagens
+
 #################################################################################
 def bd_obter_eventos():
     db = bd_conecta()
@@ -112,6 +124,8 @@ def bd_adicionar_evento(tipo, data, titulo, descricao, hora, duracao, id_periodo
     db = bd_conecta()
     db.execute('insert into eventos (tipo, data, titulo, descricao, hora, duracao, id_periodo) values (?, ?, ?, ?, ?, ?, ?)',
                  [int(tipo), data, titulo, descricao, hora, duracao, id_periodo])
+    db.execute('update atualizacoes set hora=?,data=? where id=1',
+                 [ data, hora])
     db.commit()
 
 def bd_deletar_evento(id):
@@ -150,7 +164,11 @@ def deleta_periodo():
         return "Periodo Removido."
     else:
         return "Erro: Falta os Parametros: Id."
-
+#############################################################
+@app.route('/atualizacoes')
+def listar_atualizacoes():
+    atualizacoes = bd_obter_atualizacoes()
+    return jsonify(atualizacoes)
 #############################################################
 @app.route('/eventos')
 def listar_eventos():

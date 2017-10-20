@@ -21,18 +21,29 @@ public class UsuarioDAO {
         cv.put("idPer", idPer);
         return gw.getDatabase().insert(TABLE_CLIENTES, null, cv) > 0;
     }
+    public boolean atualizar(String idPer) {
+        ContentValues cv = new ContentValues();
+        cv.put("idPer", idPer);
+        return gw.getDatabase().update(TABLE_CLIENTES, cv, "idUsu=?", new String[]{"1"}) > 0;
+    }
     public Usuario retornaUsu(){
-        Usuario Usu ;
-        Cursor cursor=gw.getDatabase().rawQuery("SELECT * FROM Usuario", null);
-        int idUsu = cursor.getInt(cursor.getColumnIndex("idUsu"));
-        String idPer = cursor.getString(cursor.getColumnIndex("idPers"));
-        Usu=new Usuario(idUsu, idPer);
-        cursor.close();
-        return Usu;
+        Cursor cursor = gw.getDatabase().rawQuery("SELECT * FROM Usuario ORDER BY idUsu DESC", null);
+        Usuario retorno;
+        if(cursor.moveToFirst()){
+            int idUsu = cursor.getInt(cursor.getColumnIndex("idUsu"));
+            String idPer = cursor.getString(cursor.getColumnIndex("idPer"));
+            cursor.close();
+            retorno=new Usuario(idUsu,idPer);
+            return retorno;
+        }
+        retorno=new Usuario(1,"-1");
+        return retorno;
+
     }
     public String retornaIdPer(){
         Cursor cursor=gw.getDatabase().rawQuery("SELECT * FROM Usuario", null);
         String idPer = cursor.getString(cursor.getColumnIndex("idPers"));
+        cursor.close();
         return idPer;
     }
 }

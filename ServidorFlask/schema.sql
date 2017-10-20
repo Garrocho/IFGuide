@@ -1,5 +1,7 @@
 drop table if exists eventos;
 drop table if exists periodos;
+drop table if exists atualizacoes;
+
 
 create table periodos (
   id integer primary key autoincrement,
@@ -17,3 +19,14 @@ create table eventos (
   titulo varchar,
   descricao text
 );
+
+create table atualizacoes (
+  id integer primary key,
+  hora varchar,
+  data varchar,
+);
+
+insert into atualizacoes (id,hora,data) values(1,'0','0');
+
+
+

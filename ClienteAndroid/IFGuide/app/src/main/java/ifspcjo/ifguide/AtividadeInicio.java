@@ -1,15 +1,14 @@
 package ifspcjo.ifguide;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-
-import java.util.ArrayList;
 
 import com.github.kittinunf.fuel.Fuel;
 import com.github.kittinunf.fuel.core.FuelError;
@@ -20,13 +19,7 @@ import com.github.kittinunf.fuel.core.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.view.*;
-import android.widget.Toast;
-
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.content.Context;
+import java.util.ArrayList;
 
 public class AtividadeInicio extends AppCompatActivity {
     ListView lv;
@@ -43,10 +36,7 @@ public class AtividadeInicio extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.atividade_inicio);
-
-        dao = new UsuarioDAO(getBaseContext());
-        boolean sucesso = dao.salvar(idPer);
-
+        UsuarioDAO dao = new UsuarioDAO(getBaseContext());
         verificaPeriodo();
     }
 
@@ -63,6 +53,7 @@ public class AtividadeInicio extends AppCompatActivity {
             case R.id.botao_voltar:
                 // User chose the "Settings" item, show the app settings UI...
                 idPer = null;
+                //boolean sucesso = dao.salvar("-1");
                 verificaPeriodo();
                 return true;
 
@@ -77,14 +68,14 @@ public class AtividadeInicio extends AppCompatActivity {
     public void verificaPeriodo() {
 
         // Busca o idPer na base de dados (criar Tabela)
-        //UsuarioDAO dao = new UsuarioDAO(getBaseContext());
-        idPer=dao.retornaIdPer();
         // ....
+        //Usuario aux=dao.retornaUsu();
+        //idPer=aux.getIdPer();
         //....
 
-        if (idPer == null) {
+        if (idPer == null||idPer=="-1") {
 
-            Fuel.get("http://127.0.0.1:8080/periodos").responseString(new Handler<String>() {
+            Fuel.get("http://192.168.1.37:8080/periodos").responseString(new Handler<String>() {
                 @Override
                 public void failure(Request request, Response response, FuelError error) {
                     //do something when it is failure
@@ -118,11 +109,12 @@ public class AtividadeInicio extends AppCompatActivity {
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            idPer = ids.get(position);
-                            //----
-                            UsuarioDAO dao = new UsuarioDAO(getBaseContext());
-                            boolean sucesso = dao.salvar(idPer);
-                            //--
+                            idPer = ids.get(position).toString();
+                            //Armazena o idPer
+
+                            //boolean sucesso = dao.salvar(idPer);
+
+
                             baixarEventos();
                         }
                     });
@@ -135,7 +127,7 @@ public class AtividadeInicio extends AppCompatActivity {
 
     public void baixarEventos() {
 
-        Fuel.get("http://127.0.0.1:8080/eventos?id_periodo="+idPer).responseString(new Handler<String>() {
+        Fuel.get("http://192.168.1.37:8080/eventos?id_periodo="+idPer).responseString(new Handler<String>() {
             @Override
             public void failure(Request request, Response response, FuelError error) {
                 //do something when it is failure
