@@ -124,8 +124,7 @@ def bd_adicionar_evento(tipo, data, titulo, descricao, hora, duracao, id_periodo
     db = bd_conecta()
     db.execute('insert into eventos (tipo, data, titulo, descricao, hora, duracao, id_periodo) values (?, ?, ?, ?, ?, ?, ?)',
                  [int(tipo), data, titulo, descricao, hora, duracao, id_periodo])
-    db.execute('update atualizacoes set hora=?,data=? where id=1',
-                 [ data, hora])
+    db.execute('update atualizacoes set id =id+1 where id = (select id from atualizacoes)')
     db.commit()
 
 def bd_deletar_evento(id):

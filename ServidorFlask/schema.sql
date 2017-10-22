@@ -21,12 +21,10 @@ create table eventos (
 );
 
 create table atualizacoes (
-  id integer primary key,
-  hora varchar,
-  data varchar,
+  id integer
 );
 
-insert into atualizacoes (id,hora,data) values(1,'0','0');
+insert into atualizacoes (id) values(1);
 
 
 
