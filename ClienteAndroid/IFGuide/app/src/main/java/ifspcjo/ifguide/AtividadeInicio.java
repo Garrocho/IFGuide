@@ -32,11 +32,12 @@ public class AtividadeInicio extends AppCompatActivity {
     public ArrayList<String> series;
     public ArrayList<String> ids;
     public UsuarioDAO dao;
+    public String ip = "192.168.43.62:8080";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.atividade_inicio);
-        UsuarioDAO dao = new UsuarioDAO(getBaseContext());
+        this.dao = new UsuarioDAO(getBaseContext());
         verificaPeriodo();
     }
 
@@ -53,7 +54,7 @@ public class AtividadeInicio extends AppCompatActivity {
             case R.id.botao_voltar:
                 // User chose the "Settings" item, show the app settings UI...
                 idPer = null;
-                //boolean sucesso = dao.salvar("-1");
+                boolean sucesso = dao.salvar("-1");
                 verificaPeriodo();
                 return true;
 
@@ -69,13 +70,14 @@ public class AtividadeInicio extends AppCompatActivity {
 
         // Busca o idPer na base de dados (criar Tabela)
         // ....
-        //Usuario aux=dao.retornaUsu();
-        //idPer=aux.getIdPer();
+        Usuario aux=dao.retornaUsu();
+        idPer=aux.getIdPer();
+        Log.d("ESORMO", idPer);
         //....
 
-        if (idPer == null||idPer=="-1") {
+        if (idPer == null||idPer.equalsIgnoreCase("-1")) {
 
-            Fuel.get("http://192.168.1.37:8080/periodos").responseString(new Handler<String>() {
+            Fuel.get("http://"+ this.ip + "/periodos").responseString(new Handler<String>() {
                 @Override
                 public void failure(Request request, Response response, FuelError error) {
                     //do something when it is failure
@@ -112,7 +114,7 @@ public class AtividadeInicio extends AppCompatActivity {
                             idPer = ids.get(position).toString();
                             //Armazena o idPer
 
-                            //boolean sucesso = dao.salvar(idPer);
+                            boolean sucesso = dao.salvar(idPer);
 
 
                             baixarEventos();
@@ -127,7 +129,7 @@ public class AtividadeInicio extends AppCompatActivity {
 
     public void baixarEventos() {
 
-        Fuel.get("http://192.168.1.37:8080/eventos?id_periodo="+idPer).responseString(new Handler<String>() {
+        Fuel.get("http://"+ this.ip + "/eventos?id_periodo="+idPer).responseString(new Handler<String>() {
             @Override
             public void failure(Request request, Response response, FuelError error) {
                 //do something when it is failure
@@ -160,7 +162,7 @@ public class AtividadeInicio extends AppCompatActivity {
                 titulos.add(evento.getString("titulo"));
                 datas.add(evento.getString("data"));
                 descricoes.add(evento.getString("descricao"));
-                horas.add(evento.getString("hora") + " as " + evento.getString("duracao"));
+                horas.add("Hora: " + evento.getString("hora") + " (" + evento.getString("duracao") + " min)");
 
             }
 

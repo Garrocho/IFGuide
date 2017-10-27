@@ -1,6 +1,7 @@
 package ifspcjo.ifguide;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,9 @@ public class AdaptadorEventos extends ArrayAdapter<String> {
         rotuloData.setText(datas.get(position));
         rotuloDescricao.setText(descricoes.get(position));
         rotuloHora.setText(horas.get(position));
+
+
+        itemLista.setBackgroundColor(context.getResources().getColor(R.color.vermelho));
 
         return itemLista;
 
