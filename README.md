@@ -1,5 +1,5 @@
-# EsOrMo (Estudo Organizado e Monitorado)
-Um Sistema de Planejamento e Organização de Atividades Acadêmicas
+# MyEvents - Meus Eventos Acadêmicos
+Um Sistema de Organização de Atividades Acadêmicas
 
 ## Colaboradores
 * Charles Tim Batista Garrocho
