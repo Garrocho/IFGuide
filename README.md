@@ -1,4 +1,4 @@
-# MyEvents - Meus Eventos Acadêmicos
+# IFGuide | MyEvents - Meus Eventos Acadêmicos
 Um Sistema de Organização de Atividades Acadêmicas
 
 ## Colaboradores
